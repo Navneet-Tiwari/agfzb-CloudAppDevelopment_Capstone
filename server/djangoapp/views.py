@@ -15,6 +15,16 @@ logger = logging.getLogger(__name__)
 
 
 # Create your views here.
+def sample_django_vw(request):
+    context = {}
+    # If the request method is GET
+    if request.method == 'GET':
+        # Using the objects model manage to read all course list
+        # and sort them by total_enrollment descending
+        #course_list = Course.objects.order_by('-total_enrollment')[:10]
+        # Appen the course list as an entry of context dict
+        context['sample_text'] = 'Sample view and template'
+        return render(request, 'djangoapp/static_django_template.html', context)
 
 
 # Create an `about` view to render a static about page

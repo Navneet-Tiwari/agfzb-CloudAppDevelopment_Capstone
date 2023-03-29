@@ -9,6 +9,10 @@ urlpatterns = [
     # view refers to the view function
     # name the URL
 
+    # path for sample view
+    
+    path(route='sample_django_vw/', view=views.sample_django_vw, name='sample_django_vw'),
+
     # path for about view
 
     # path for contact us view
@@ -20,6 +24,7 @@ urlpatterns = [
     # path for logout
 
     path(route='', view=views.get_dealerships, name='index'),
+    
 
     # path for dealer reviews view
 
