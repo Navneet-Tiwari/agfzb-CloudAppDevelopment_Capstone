@@ -46,10 +46,13 @@ def post_request(url, json_payload, **kwargs):
     print(f"POST to {url}")
     try:
         response = requests.post(url, params=kwargs, json=json_payload)
+        status_code = response.status_code
+        print(f"With status {status_code}")
     except:
         print("An error occurred while making POST request. ")
-    status_code = response.status_code
-    print(f"With status {status_code}")
+        response =  {"An error occurred while making POST request. "}
+    # status_code = response.status_code
+    
 
     return response
 
@@ -80,7 +83,7 @@ def get_dealers_from_cf(url, **kwargs):
             dealer_obj = CarDealer(address=dealer_doc["address"], city=dealer_doc["city"], full_name=dealer_doc["full_name"],
                                    id=dealer_doc["id"], lat=dealer_doc["lat"], long=dealer_doc["long"],
                                    short_name=dealer_doc["short_name"],
-                                   st=dealer_doc["st"], zip=dealer_doc["zip"])
+                                   st=dealer_doc["st"], zip=dealer_doc["zip"], state=dealer_doc["state"])
             results.append(dealer_obj)
 
     # results.append(dealer_obj)
@@ -162,7 +165,8 @@ def get_dealer_by_id(url, dealer_id):
     print(json_result)
 
     # Create a CarDealer object from response
-    dealer = json_result["entries"][0]
+    dealer = json_result[0]
+    print(dealer)
     dealer_obj = CarDealer(address=dealer["address"], city=dealer["city"], full_name=dealer["full_name"],
                            id=dealer["id"], lat=dealer["lat"], long=dealer["long"],
                            short_name=dealer["short_name"],
