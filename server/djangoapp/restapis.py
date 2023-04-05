@@ -48,9 +48,15 @@ def post_request(url, json_payload, **kwargs):
         response = requests.post(url, params=kwargs, json=json_payload)
         status_code = response.status_code
         print(f"With status {status_code}")
-    except:
+    except Exception as e: 
         print("An error occurred while making POST request. ")
-        response =  {"An error occurred while making POST request. "}
+        # response =  {"An error occurred while making POST request. "}
+        print(f"Exception in POST request {e}")
+        return {
+            'status_code': 404,
+            'message': "An error occurred while making POST request.",
+            'Exception': str(e)
+        }
     # status_code = response.status_code
     
 
@@ -117,23 +123,53 @@ def get_dealer_reviews_from_cf(url, dealer_id):
          
         # For every review in the response
 
+        # for i in range(length):
+
         for review in reviews:
-            # Create a DealerReview object from the data
-            # These values must be present
-            print(review)
-            review_content = review["review"]
+
             id = review["_id"]
-            name = review["name"]
-            purchase = review["purchase"]
-            dealership = review["dealership"]
+
+            if 'document' in review:
+                review_content = review['document']['review']
+                name = review['document']["name"]
+                purchase = review['document']["purchase"]
+                dealership = review['document']["dealership"]
+                try:
+                    
+                    car_make = review['document']["car_make"]
+                    car_model = review['document']["car_model"]
+                    car_year = review['document']["car_year"]
+                    purchase_date = review['document']["purchase_date"]
+                except:
+                    print('make,model,Year not found ')
+            else:
+                # Create a DealerReview object from the data
+                # These values must be present
+                print(review)
+                review_content = review.get("review")
+                # id = review["_id"]
+                # name = review["name"]
+                # purchase = review["purchase"]
+                # dealership = review["dealership"]
+                id = review.get("_id")
+                name = review.get("name")
+                purchase = review.get("purchase")
+                dealership = review.get("dealership")
+
+                try:
+                    # These values may be missing
+                    # car_make = review["car_make"]
+                    # car_model = review["car_model"]
+                    # car_year = review["car_year"]
+                    # purchase_date = review["purchase_date"]
+                    car_make = review.get("car_make")
+                    car_model = review.get("car_model")
+                    car_year = review.get("car_year")
+                    purchase_date = review.get("purchase_date")
+                except:
+                    print('make,model,Year not found ')
 
             try:
-                # These values may be missing
-                car_make = review["car_make"]
-                car_model = review["car_model"]
-                car_year = review["car_year"]
-                purchase_date = review["purchase_date"]
-
                 # Creating a review object
                 review_obj = DealerReview(dealership=dealership, id=id, name=name, 
                                         purchase=purchase, review=review_content, car_make=car_make, 

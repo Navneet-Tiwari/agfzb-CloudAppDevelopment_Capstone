@@ -162,13 +162,14 @@ def add_review(request, dealer_id):
         if request.method == "POST":
             form = request.POST
             review = dict()
-            review["name"] = f"{request.user.first_name} {request.user.last_name}"
+            review["name"] = f"{request.user.username}"
             review["dealership"] = dealer_id
             review["review"] = form["content"]
             if form.get("purchasecheck") =='on':
-                review["purchase"] = 1
+                review["purchase"] = True
             if review["purchase"]:
-                review["purchase_date"] = datetime.strptime(form.get("purchasedate"), "%m/%d/%Y").isoformat()
+                dt = datetime.strptime(form.get("purchasedate"), "%m/%d/%Y").isoformat()
+                review["purchase_date"] = json.dumps(dt, default=str)
             car = CarModel.objects.get(pk=form["car"])
             review["car_make"] = car.car_make.name
             review["car_model"] = car.name
@@ -180,19 +181,23 @@ def add_review(request, dealer_id):
             else: 
                 review["purchase_date"] = None
 
-            print('review payload is ' , review)
+            # print('review payload is ' , review)
             url = "https://us-south.functions.appdomain.cloud/api/v1/web/49a1a341-7f80-4e2f-b9bc-2cfa6c0bcf63/dealership-package/post-review"  # API Cloud Function route
             json_payload = {"review": review}  # Create a JSON payload that contains the review data
+            # Convert date object to string representation
+            json_payload['review']['car_year'] = str(json_payload['review']['car_year'])
+            print('json_payload payload is ' , json_payload)
+
 
             # Performing a POST request with the review
             result = post_request(url, json_payload, dealerId=dealer_id)
             print('result is ', result)
-            if int(result.status_code) == 201:
+            if int(result.status_code) == 200:
                 print("Review posted successfully.")
 
             # After posting the review the user is redirected back to the dealer details page
-            # return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
-            return HttpResponseRedirect(reverse(viewname='djangoapp:dealer_details',dealer_id=dealer_id))
+            return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
+            # return HttpResponseRedirect(reverse(viewname='djangoapp:dealer_details',dealer_id=dealer_id))
 
     else:
         # If user isn't logged in, redirect to login page
